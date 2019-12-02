@@ -44,6 +44,10 @@ FBK: ucmd mkdir -p /mnt/ext3
 FBK: ucmd mmc=`cat /tmp/mmcdev`; mount /dev/mmcblk${mmc}p2 /mnt/ext3
 FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
 FBK: ucp  fsl-image-validation-myimx8m.tar.bz2 t:-
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
+FBK: ucp  kernel-modules.tar.bz2 t:-
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
+FBK: ucp  my-rootfs-update.tar.bz2 t:-
 FBK: Sync
 FBK: ucmd umount /mnt/ext3
 
