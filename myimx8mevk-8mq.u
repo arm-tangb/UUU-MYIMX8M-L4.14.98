@@ -32,6 +32,8 @@ FBK: ucmd mkdir -p /mnt/fat
 FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t vfat /dev/mmcblk${mmc}p1 /mnt/fat
 FBK: ucp  Image t:/mnt/fat
 FBK: ucp  myimx8mevk-8mq.dtb t:/mnt/fat
+FBK: ucp  myimx8mevk-8mq-dcss-bi3103s.dtb t:/mnt/fat
+FBK: ucp  myimx8mevk-8mq-lcdif-bi3103s.dtb t:/mnt/fat
 FBK: Sync
 FBK: ucmd umount /mnt/fat
 
