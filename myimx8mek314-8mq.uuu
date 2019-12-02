@@ -1,0 +1,7 @@
+uuu_version 1.2.135
+
+SDP: boot -f myimx8malpha-8mq.bin
+
+SDPV: delay 1000
+SDPV: write -f myimx8malpha-8mq.bin -skipspl
+SDPV: jump
