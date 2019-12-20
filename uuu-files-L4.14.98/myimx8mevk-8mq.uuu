@@ -1,0 +1,57 @@
+uuu_version 1.2.135
+
+SDP: boot -f ../image-boot-L4.14.98/myimx8mevk-8mq.bin
+
+SDPV: delay 1000
+SDPV: write -f ../image-boot-L4.14.98/myimx8mevk-8mq.bin -skipspl
+SDPV: jump
+
+FB: ucmd setenv fastboot_dev mmc
+FB: ucmd setenv mmcdev ${emmc_dev}
+FB: flash bootloader ../image-boot-L4.14.98/myimx8mevk-8mq.bin
+
+FB: ucmd if env exists emmc_ack; then ; else setenv emmc_ack 0; fi;
+
+FB: ucmd setenv emmc_cmd mmc partconf ${emmc_dev} ${emmc_ack} 1 0
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+FB: ucmd setenv emmc_cmd mmc bootbus ${emmc_dev} 2 2 1;
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f ../image-kernel-L4.14.98/Image
+FB: ucmd setenv fastboot_buffer ${fdt_addr}
+FB: download -f ../image-dtb-L4.14.98/myimx8mevk-8mq.dtb
+FB: ucmd setenv fastboot_buffer ${initrd_addr}
+FB: download -f ./fsl-image-mfgtool-initramfs-imx
+FB: acmd ${kboot} ${loadaddr} ${initrd_addr} ${fdt_addr}
+
+FBK: ucmd while [ ! -e /dev/mmcblk*boot0 ]; do sleep 1; echo "wait for /dev/mmcblk*boot* appear"; done;
+FBK: ucmd dev=`ls /dev/mmcblk*boot*`; dev=($dev); dev=${dev[0]}; dev=${dev#/dev/mmcblk}; dev=${dev%boot*}; echo $dev > /tmp/mmcdev;
+FBK: ucmd mmc=`cat /tmp/mmcdev`; parted -s /dev/mmcblk${mmc} mklabel msdos
+FBK: ucmd mmc=`cat /tmp/mmcdev`; PARTSTR=$'10M,500M,0c\n600M,,83\n'; echo "$PARTSTR" | sfdisk --force /dev/mmcblk${mmc}
+FBK: ucmd mmc=`cat /tmp/mmcdev`; dd if=/dev/zero of=/dev/mmcblk${mmc} bs=1k seek=4096 count=1
+FBK: ucmd sync
+FBK: ucmd mmc=`cat /tmp/mmcdev`; while [ ! -e /dev/mmcblk${mmc}p1 ]; do sleep 1; done
+
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkfs.vfat /dev/mmcblk${mmc}p1
+FBK: ucmd mkdir -p /mnt/fat
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t vfat /dev/mmcblk${mmc}p1 /mnt/fat
+FBK: ucp  ../image-kernel-L4.14.98/Image t:/mnt/fat
+FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq.dtb t:/mnt/fat
+FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq-dcss-bi3103s.dtb t:/mnt/fat
+FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq-lcdif-bi3103s.dtb t:/mnt/fat
+FBK: ucmd umount /mnt/fat
+
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkfs.ext3 -F -E nodiscard /dev/mmcblk${mmc}p2
+FBK: ucmd mkdir -p /mnt/ext3
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount /dev/mmcblk${mmc}p2 /mnt/ext3
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
+FBK: ucp  ../image-rootfs-L4.14.98/fsl-image-validation-myimx8m.tar.bz2 t:-
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
+FBK: ucp  ../image-kernel-L4.14.98/kernel-modules.tar.bz2 t:-
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -jx -C /mnt/ext3
+FBK: ucp  ../image-update-L4.14.98/my-rootfs-update.tar.bz2 t:-
+FBK: Sync
+FBK: ucmd umount /mnt/ext3
+
+FBK: DONE

@@ -1,6 +1,6 @@
 
-@echo off 
+@echo off
 
-start /b /wait ./uuu.exe ./fsl-imx8mq-evk.uuu 
+start /b /wait ./uuu-files-L4.14.98/uuu.exe ./uuu-files-L4.14.98/fsl-imx8mq-evk.uuu
 
-pause 
+pause
