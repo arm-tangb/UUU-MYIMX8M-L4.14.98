@@ -38,8 +38,7 @@ FBK: ucmd mkdir -p /mnt/fat
 FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t vfat /dev/mmcblk${mmc}p1 /mnt/fat
 FBK: ucp  ../image-kernel-L4.14.98/Image t:/mnt/fat
 FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq.dtb t:/mnt/fat
-FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq-dcss-bi3103s.dtb t:/mnt/fat
-FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq-lcdif-bi3103s.dtb t:/mnt/fat
+FBK: ucp  ../image-dtb-L4.14.98/myimx8mevk-8mq-hdmi.dtb t:/mnt/fat
 FBK: ucmd umount /mnt/fat
 
 FBK: ucmd mmc=`cat /tmp/mmcdev`; mkfs.ext3 -F -E nodiscard /dev/mmcblk${mmc}p2
